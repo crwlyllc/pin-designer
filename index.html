@@ -1,0 +1,1760 @@
+<!-- Iconify + 2D Photo-Dome Pin Configurator: Blank Fill + Images, Text, Icons & Filters -->
+
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto&family=Open+Sans&family=Lato&family=Montserrat&family=Merriweather&family=Raleway&family=Poppins&family=Source+Sans+Pro&family=Oswald&family=Noto+Sans&family=Playfair+Display&display=swap" rel="stylesheet">
+<!-- Material Icons for align buttons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+
+<style>
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+  /* Base container */
+  .pincc-wrapper {
+    max-width: 76.25rem;
+    width: 100%;
+    margin: 0 auto;
+    padding: 48px 24px;
+    text-align: center;
+    font-family: inherit;
+    display: flex;
+    flex-direction: column;
+  }
+
+  @media (min-width: 768px) {
+    .pincc-wrapper {
+      flex-direction: row;
+      align-items: flex-start;
+      text-align: left;
+    }
+    .pincc-canvas { margin: 0; }
+    .pincc-controls { margin-top: 0; margin-left: 32px; justify-content: flex-start; }
+
+    .pincc-design-column,
+    .pincc-controls {
+      flex: 0 0 50%;
+      max-width: 50%;
+    }
+  }
+
+  .pincc-canvas {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    height: auto;
+    margin: 0 auto 32px;
+    display: block;
+    cursor: grab;
+  }
+  .pincc-canvas.dragging { cursor: grabbing; }
+
+  /* Top-row basics */
+  .pincc-basic-options {
+    display: flex; flex-wrap: wrap; gap: 16px;
+    justify-content: center; margin-bottom: 32px;
+  }
+  .pincc-basic-options .pincc-group { border-top: none; padding-top: 0; margin-top: 0; }
+
+  .pincc-controls {
+    margin-top: 32px;
+    display: flex; flex-wrap: wrap; gap: 16px; align-items: center;
+    justify-content: center;
+  }
+
+  .pincc-button {
+    background-color: #111; color: #fff;
+    border: none; border-radius: 4px;
+    padding: 12px 24px; font-size: 16px; font-weight: 500;
+    cursor: pointer;
+  }
+  .pincc-button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .pincc-file-input,
+  .pincc-select {
+    font-size: 16px; color: #333;
+    padding: 8px 12px; border: 1px solid #ccc;
+    border-radius: 4px; background: #fff;
+    height: 40px;
+  }
+
+  .pincc-label {
+    display: flex; flex-direction: column;
+    font-size: 14px; color: #333;
+  }
+  /* Checkbox labels should be inline and centered */
+  .pincc-checkbox-label {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+  .pincc-slider { width: 120px; margin-top: 4px; }
+  .pincc-color-input { width: 40px; height: 40px; border: none; padding: 0; }
+
+  /* Two-column layout for Text controls */
+  .pincc-text-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: flex-start;
+    align-content: flex-start;
+    margin-top: 16px;
+    justify-content: flex-start;
+  }
+  .pincc-text-controls .pincc-text-col {
+    flex: 0 0 calc(50% - 6px);
+    max-width: calc(50% - 6px);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  /* Reset buttons row for text controls */
+  .pincc-text-resets {
+    width: 100%;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+  }
+  .pincc-inline-reset {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .pincc-reset-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pincc-reset-icon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .pincc-reset-icon .material-icons {
+    font-size: 20px;
+  }
+  /* Group font select and style buttons */
+  .pincc-font-group {
+    flex: 1 1 200px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+  .pincc-font-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+  }
+  .pincc-text-input {
+    font-size: 16px; padding: 8px 12px;
+    border: 1px solid #ccc; border-radius: 4px;
+    width: 160px; resize: none;
+  }
+
+  .pincc-group {
+    border-top: 1px solid #ddd;
+    padding-top: 16px; margin-top: 16px;
+    width: 100%; display: flex; flex-wrap: wrap;
+    gap: 12px; justify-content: center;
+    align-items: center;
+  }
+  .pincc-move-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+  .pincc-move-row,
+  .pincc-align-row {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    width: 100%;
+  }
+  .pincc-align-row {
+    margin-top: 12px;
+  }
+  /* File upload and Add Text button inline and vertically centered */
+  .pincc-file-text-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    /* prevent children from wrapping */
+    flex-wrap: nowrap;
+  }
+  /* allow file input label to shrink so button stays on same line */
+  .pincc-file-text-group .pincc-label {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+  /* ensure button text does not wrap */
+  .pincc-file-text-group .pincc-button {
+  white-space: nowrap;
+  box-sizing: border-box;
+  padding: 0 24px;
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  align-self: center;
+  margin: 0;
+  }
+  /* Ensure icon select shows all icon options */
+  .pincc-icon-controls .pincc-select {
+    min-width: 80px;
+  }
+  .pincc-upload-layers .pincc-label,
+  .pincc-type-section .pincc-label,
+  .pincc-shape-metal   .pincc-label,
+  .pincc-image-controls .pincc-label {
+    flex: 1 1 200px;
+  }
+  .pincc-text-controls .pincc-label {
+    flex: none;
+    width: auto;
+  }
+  /* Hide layer controls until at least one layer exists */
+  .pincc-wrapper:not(.has-layers) .pincc-upload-layers > label.pincc-label,
+  .pincc-wrapper:not(.has-layers) .pincc-upload-layers > button#pincc-delete-layer,
+  .pincc-wrapper:not(.has-layers) .pincc-upload-layers > .pincc-move-buttons {
+    display: none !important;
+  }
+  /* Delete button in red */
+  #pincc-delete-layer.pincc-delete-button {
+    background-color: #e74c3c;
+    color: #fff;
+  }
+
+  /* Lightweight icon-style buttons for align controls */
+  .pincc-align-button {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 8px;
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    box-sizing: border-box;
+  }
+  .pincc-align-button .material-icons,
+  .pincc-align-button .material-symbols-outlined {
+     font-size: 20px;
+     line-height: 1;
+   }
+</style>
+
+
+<div class="pincc-wrapper">
+  <div class="pincc-design-column">
+  <canvas id="pincc-canvas" class="pincc-canvas"></canvas>
+
+  <!-- Pin Type / Shape / Metal / BG Color -->
+  <div class="pincc-basic-options">
+    <div class="pincc-group pincc-type-section">
+      <label class="pincc-label">Pin Type
+        <select id="pincc-type-select" class="pincc-select">
+          <option value="photo">Photo Dome Pins</option>
+          <option value="soft">Soft Enamel Pins</option>
+          <option value="hard">Hard Enamel Pins</option>
+          <option value="diecast">Die Cast Pins</option>
+          <option value="diestruck">Die Struck Pins</option>
+        </select>
+      </label>
+    </div>
+    <div class="pincc-group pincc-shape-metal">
+      <label class="pincc-label">Shape
+        <select id="pincc-shape-select" class="pincc-select">
+          <option value="circle">Circle</option>
+          <option value="oval">Oval</option>
+          <option value="square">Square</option>
+          <option value="rectangle">Rectangle</option>
+        </select>
+      </label>
+      <label class="pincc-label">Metal Finish
+        <select id="pincc-metal-select" class="pincc-select">
+          <option value="gold">Gold</option>
+          <option value="antique-gold">Antique Gold</option>
+          <option value="bronze">Bronze</option>
+          <option value="antique-bronze">Antique Bronze</option>
+          <option value="copper">Copper</option>
+          <option value="antique-copper">Antique Copper</option>
+          <option value="silver">Silver</option>
+          <option value="antique-silver">Antique Silver</option>
+          <option value="black-nickel">Black Nickel</option>
+          <option value="black-dye">Black Dye</option>
+          <option value="white-dye">White Dye</option>
+          <option value="green-dye">Green Dye</option>
+          <option value="red-dye">Red Dye</option>
+          <option value="blue-dye">Blue Dye</option>
+        </select>
+      </label>
+      <label class="pincc-label">Background Color
+        <input type="color" id="pincc-background-color" class="pincc-color-input" value="#f0f0f0">
+      </label>
+    </div>
+  </div>
+
+  </div>
+  <div class="pincc-controls">
+    <h1 class="pincc-title">Pin Designer</h1>
+    <!-- Image Upload & Layers -->
+    <div class="pincc-group pincc-upload-layers">
+      <div class="pincc-file-text-group">
+        <label for="pincc-photo-upload" class="pincc-button">Upload Images</label>
+        <input type="file" id="pincc-photo-upload" class="pincc-file-input" accept="image/*,image/svg+xml" multiple hidden>
+        <button id="pincc-add-text" class="pincc-button">Add Text</button>
+        <button id="pincc-add-icon" class="pincc-button">Add Icon</button>
+        <button id="pincc-add-shape" class="pincc-button">Add Shape</button>
+      </div>
+      <label class="pincc-label">Current Layer
+        <select id="pincc-layer-select" class="pincc-select">
+          <option disabled selected>-- No Layers --</option>
+        </select>
+      </label>
+      <button id="pincc-delete-layer" class="pincc-button pincc-delete-button" disabled>Delete Layer</button>
+      <button id="pincc-duplicate-layer" class="pincc-button" disabled>Duplicate Layer</button>
+      <div class="pincc-move-buttons">
+        <div class="pincc-move-row">
+          <button id="pincc-move-up" class="pincc-button" disabled>Move Layer Down</button>
+          <button id="pincc-move-down" class="pincc-button" disabled>Move Layer Up</button>
+        </div>
+        <div class="pincc-align-row">
+          <button id="pincc-align-center" class="pincc-button pincc-align-button" title="Align Center">
+            <span class="material-symbols-outlined">align_horizontal_center</span>
+          </button>
+          <button id="pincc-align-horizontal" class="pincc-button pincc-align-button" title="Align Vertical Center">
+            <span class="material-symbols-outlined">align_vertical_center</span>
+          </button>
+          <button id="pincc-align-left" class="pincc-button pincc-align-button" title="Align Left">
+            <span class="material-symbols-outlined">align_horizontal_left</span>
+          </button>
+          <button id="pincc-align-right" class="pincc-button pincc-align-button" title="Align Right">
+            <span class="material-symbols-outlined">align_horizontal_right</span>
+          </button>
+          <button id="pincc-align-top" class="pincc-button pincc-align-button" title="Align Top">
+            <span class="material-symbols-outlined">align_vertical_top</span>
+          </button>
+          <button id="pincc-align-bottom" class="pincc-button pincc-align-button" title="Align Bottom">
+            <span class="material-symbols-outlined">align_vertical_bottom</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Brightness / Contrast -->
+    <div class="pincc-group pincc-image-controls">
+      <label class="pincc-label">Brightness
+        <input type="range" id="pincc-brightness-slider" class="pincc-slider" min="0" max="200" value="100">
+        <input type="number" id="pincc-brightness-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" min="0" max="200" value="100">
+      </label>
+      <label class="pincc-label">Contrast
+        <input type="range" id="pincc-contrast-slider" class="pincc-slider" min="0" max="200" value="100">
+        <input type="number" id="pincc-contrast-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" min="0" max="200" value="100">
+      </label>
+      <label class="pincc-label">Size
+        <input type="range" id="pincc-image-size-slider" class="pincc-slider" min="10" max="500" value="100">
+        <input type="number" id="pincc-image-size-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" min="10" max="500" value="100">
+      </label>
+      <label class="pincc-label pincc-checkbox-label"><input type="checkbox" id="pincc-background-checkbox"> Background Image</label>
+      <button id="pincc-reset-filters" class="pincc-button" disabled>Reset Filters</button>
+    </div>
+
+    <!-- Icon Controls -->
+    <div class="pincc-group pincc-icon-controls" id="pincc-icon-controls" style="display:none;">
+      <label class="pincc-label">Icon
+        <select id="pincc-icon-select" class="pincc-select">
+          <option value="★">★</option>
+          <option value="☆">☆</option>
+          <option value="♥">♥</option>
+          <option value="♠">♠</option>
+          <option value="♣">♣</option>
+          <option value="♦">♦</option>
+          <option value="■">■</option>
+          <option value="□">□</option>
+          <option value="●">●</option>
+          <option value="○">○</option>
+          <option value="▲">▲</option>
+          <option value="△">△</option>
+          <option value="◆">◆</option>
+          <option value="◇">◇</option>
+          <option value="✦">✦</option>
+          <option value="✧">✧</option>
+          <option value="✪">✪</option>
+          <option value="✩">✩</option>
+          <option value="✿">✿</option>
+          <option value="❃">❃</option>
+          <option value="❖">❖</option>
+          <option value="✈">✈</option>
+          <option value="⚡">⚡</option>
+          <option value="✓">✓</option>
+          <option value="✕">✕</option>
+          <option value="♪">♪</option>
+          <option value="♫">♫</option>
+          <option value="☀">☀</option>
+          <option value="☾">☾</option>
+        </select>
+      </label>
+      <label class="pincc-label">Color
+        <input type="color" id="pincc-icon-color" class="pincc-color-input" value="#000000">
+      </label>
+      <label class="pincc-label">Size
+        <input type="range" id="pincc-icon-size" class="pincc-slider" min="16" max="200" value="48">
+        <input type="number" id="pincc-icon-size-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" min="16" max="200" value="48">
+      </label>
+      <label class="pincc-label">Rotation
+        <input type="range" id="pincc-icon-rotation" class="pincc-slider" min="-180" max="180" value="0">
+        <input type="number" id="pincc-icon-rotation-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" min="-180" max="180" value="0">
+      </label>
+    </div>
+
+    <div class="pincc-group pincc-shape-controls" id="pincc-shape-controls" style="display:none;">
+      <label class="pincc-label">Shape Type
+        <select id="pincc-shape-type-select" class="pincc-select">
+          <option value="circle">Circle</option>
+          <option value="square">Square</option>
+        </select>
+      </label>
+      <label class="pincc-label">Size
+        <input type="range" id="pincc-shape-size" class="pincc-slider" min="10" max="500" value="100">
+        <input type="number" id="pincc-shape-size-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" value="100">
+      </label>
+      <label class="pincc-label">Background Color
+        <input type="color" id="pincc-shape-bg-color" class="pincc-color-input" value="#FF8361">
+        <label class="pincc-checkbox-label"><input type="checkbox" id="pincc-shape-bg-transparent"> Transparent</label>
+      </label>
+      <label class="pincc-label">Border Color
+        <input type="color" id="pincc-shape-border-color" class="pincc-color-input" value="#000000">
+      </label>
+      <label class="pincc-label">Border Width
+        <input type="range" id="pincc-shape-border-width" class="pincc-slider" min="0" max="50" value="1">
+      </label>
+    </div>
+
+    <!-- Text Controls -->
+    <div class="pincc-group pincc-text-controls" id="pincc-text-controls">
+      <div class="pincc-text-col">
+        <label class="pincc-label">Text
+          <textarea id="pincc-text-input" class="pincc-text-input" placeholder="Your text" rows="3"></textarea>
+        </label>
+        <label class="pincc-label">Font
+          <select id="pincc-font-select" class="pincc-select">
+            <option value="Arial">Arial</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Georgia">Georgia</option>
+            <option value="&quot;Times New Roman&quot;">Times New Roman</option>
+            <option value="&quot;Courier New&quot;">Courier New</option>
+            <option value="&quot;Trebuchet MS&quot;">Trebuchet MS</option>
+            <option value="&quot;Comic Sans MS&quot;">Comic Sans MS</option>
+            <option value="Oswald">Oswald</option>
+            <option value="Roboto">Roboto</option>
+            <option value="&quot;Open Sans&quot;">Open Sans</option>
+            <option value="Lato">Lato</option>
+            <option value="Montserrat">Montserrat</option>
+            <option value="Merriweather">Merriweather</option>
+            <option value="Raleway">Raleway</option>
+            <option value="Poppins">Poppins</option>
+            <option value="&quot;Source Sans Pro&quot;">Source Sans Pro</option>
+            <option value="&quot;Noto Sans&quot;">Noto Sans</option>
+            <option value="&quot;Playfair Display&quot;">Playfair Display</option>
+            <option value="Helvetica">Helvetica</option>
+          </select>
+        </label>
+        <div class="pincc-font-buttons">
+          <button id="pincc-text-bold" class="pincc-button"><strong>B</strong></button>
+          <button id="pincc-text-italic" class="pincc-button"><em>I</em></button>
+        </div>
+        <label class="pincc-label">Color
+          <input type="color" id="pincc-text-color" class="pincc-color-input" value="#000000">
+        </label>
+        <label class="pincc-label">Border Color
+          <input type="color" id="pincc-border-color" class="pincc-color-input" value="#000000">
+        </label>
+        <label class="pincc-label">Align
+          <div id="pincc-text-align" class="pincc-text-align-buttons">
+            <button id="pincc-text-align-left" class="pincc-button pincc-align-button" title="Align Left">
+              <i class="material-icons">format_align_left</i>
+            </button>
+            <button id="pincc-text-align-center" class="pincc-button pincc-align-button" title="Align Center">
+              <i class="material-icons">format_align_center</i>
+            </button>
+            <button id="pincc-text-align-right" class="pincc-button pincc-align-button" title="Align Right">
+              <i class="material-icons">format_align_right</i>
+            </button>
+          </div>
+        </label>
+      </div>
+      <div class="pincc-text-col">
+        <label class="pincc-label">Size
+          <input type="range" id="pincc-text-size" class="pincc-slider" min="8" max="250" value="24">
+          <input type="number" id="pincc-text-size-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" value="24">
+        </label>
+        <label class="pincc-label">Border Size
+          <input type="range" id="pincc-border-size-slider" class="pincc-slider" min="0" max="100" value="0">
+          <input type="number" id="pincc-border-size-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" value="0">
+        </label>
+        <label class="pincc-label">Line Height
+          <div class="pincc-inline-reset">
+            <input type="range" id="pincc-line-height" class="pincc-slider" min="0.5" max="3" step="0.1" value="1">
+            <input type="number" id="pincc-line-height-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" step="0.1" value="1">
+            <button id="pincc-reset-line-height" class="pincc-reset-icon" disabled title="Reset Line Height">
+              <i class="material-icons">refresh</i>
+            </button>
+          </div>
+        </label>
+        <label class="pincc-label">Letter Spacing
+          <div class="pincc-inline-reset">
+            <input type="range" id="pincc-letter-spacing" class="pincc-slider" min="-20" max="20" value="0">
+            <input type="number" id="pincc-letter-spacing-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" value="0">
+            <button id="pincc-reset-letter-spacing" class="pincc-reset-icon" disabled title="Reset Letter Spacing">
+              <i class="material-icons">refresh</i>
+            </button>
+          </div>
+        </label>
+        <label class="pincc-label">Curve
+          <div class="pincc-inline-reset">
+            <input type="range" id="pincc-text-curve" class="pincc-slider" min="-100" max="100" value="0">
+            <input type="number" id="pincc-text-curve-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" value="0">
+            <button id="pincc-reset-curve" class="pincc-reset-icon" disabled title="Reset Curve">
+              <i class="material-icons">refresh</i>
+            </button>
+          </div>
+        </label>
+        <label class="pincc-label">Rotation
+          <div class="pincc-inline-reset">
+            <input type="range" id="pincc-text-rotation" class="pincc-slider" min="-180" max="180" value="0">
+            <input type="number" id="pincc-text-rotation-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" value="0">
+            <button id="pincc-reset-rotation" class="pincc-reset-icon" disabled title="Reset Rotation">
+              <i class="material-icons">refresh</i>
+            </button>
+          </div>
+        </label>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const canvas = document.getElementById('pincc-canvas');
+  const ctx = canvas.getContext('2d');
+  // Ensure sharp rendering by matching internal resolution to display size
+  function resizeCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    // set the canvas width/height in actual pixels
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.width * dpr;
+    // scale the drawing context and reset transform
+    ctx.resetTransform();
+    ctx.scale(dpr, dpr);
+  }
+  // Initial resize and on window resize
+  resizeCanvas();
+  window.addEventListener('resize', () => {
+    resizeCanvas();
+    draw();
+  });
+  const upload = document.getElementById('pincc-photo-upload');
+  const shapeSel = document.getElementById('pincc-shape-select');
+  const metalSel = document.getElementById('pincc-metal-select');
+  const pinTypeSel = document.getElementById('pincc-type-select');
+  const layerSel = document.getElementById('pincc-layer-select');
+  const delBtn = document.getElementById('pincc-delete-layer');
+  const dupBtn = document.getElementById('pincc-duplicate-layer');
+  const moveUpBtn = document.getElementById('pincc-move-up');
+  const moveDownBtn = document.getElementById('pincc-move-down');
+  const resetBtn = document.getElementById('pincc-reset-filters');
+  const addText = document.getElementById('pincc-add-text');
+  const txtCtrls = document.getElementById('pincc-text-controls');
+  const txtInput = document.getElementById('pincc-text-input');
+  const fontSel = document.getElementById('pincc-font-select');
+  const sizeSl = document.getElementById('pincc-text-size');
+  const colorInp = document.getElementById('pincc-text-color');
+  const borderSl = document.getElementById('pincc-border-size-slider');
+  const borderColorInp = document.getElementById('pincc-border-color');
+  const alignSel = document.getElementById('pincc-text-align');
+  const curveSl = document.getElementById('pincc-text-curve');
+  const rotSl = document.getElementById('pincc-text-rotation');
+  const lineHeightSl = document.getElementById('pincc-line-height');
+  const letterSpacingSl = document.getElementById('pincc-letter-spacing');
+  const resetCurveBtn = document.getElementById('pincc-reset-curve');
+  const resetRotationBtn = document.getElementById('pincc-reset-rotation');
+  const resetLineHeightBtn = document.getElementById('pincc-reset-line-height');
+  const resetLetterSpacingBtn = document.getElementById('pincc-reset-letter-spacing');
+  const boldBtn = document.getElementById('pincc-text-bold');
+  const italicBtn = document.getElementById('pincc-text-italic');
+  const brightSl = document.getElementById('pincc-brightness-slider');
+  const contrastSl = document.getElementById('pincc-contrast-slider');
+  const imageSizeSl = document.getElementById('pincc-image-size-slider');
+  // Number inputs for image controls
+  const brightNumber = document.getElementById('pincc-brightness-number');
+  const contrastNumber = document.getElementById('pincc-contrast-number');
+  const imageSizeNumber = document.getElementById('pincc-image-size-number');
+  // Icon number inputs
+  const iconSizeNumber = document.getElementById('pincc-icon-size-number');
+  const iconRotationNumber = document.getElementById('pincc-icon-rotation-number');
+  const backgroundChk = document.getElementById('pincc-background-checkbox');
+  const backgroundColorInp = document.getElementById('pincc-background-color');
+
+  function restoreState(state) {
+    layers = state.layers;
+    selIndex = state.selIndex;
+    backgroundColorInp.value = state.backgroundColor;
+    shapeSel.value = state.shapeValue;
+    metalSel.value = state.metalValue;
+    pinTypeSel.value = state.pinTypeValue;
+    updateControls();
+  }
+
+  const addIconBtn = document.getElementById('pincc-add-icon');
+  const iconCtrls = document.getElementById('pincc-icon-controls');
+  const iconSelect = document.getElementById('pincc-icon-select');
+  const iconColorInp = document.getElementById('pincc-icon-color');
+  const iconSizeSl = document.getElementById('pincc-icon-size');
+  const iconRotSl = document.getElementById('pincc-icon-rotation');
+  const alignCenterBtn = document.getElementById('pincc-align-center');
+  const alignHorizontalBtn = document.getElementById('pincc-align-horizontal');
+  const alignLeftBtn = document.getElementById('pincc-align-left');
+  const alignRightBtn = document.getElementById('pincc-align-right');
+  const alignTopBtn = document.getElementById('pincc-align-top');
+  const alignBottomBtn = document.getElementById('pincc-align-bottom');
+  const textAlignLeftBtn = document.getElementById('pincc-text-align-left');
+  const textAlignCenterBtn = document.getElementById('pincc-text-align-center');
+  const textAlignRightBtn = document.getElementById('pincc-text-align-right');
+  const addShapeBtn = document.getElementById('pincc-add-shape');
+  const shapeCtrls = document.getElementById('pincc-shape-controls');
+  const shapeTypeSelLayer = document.getElementById('pincc-shape-type-select');
+  const shapeSizeSlLayer = document.getElementById('pincc-shape-size');
+  const shapeSizeNumber = document.getElementById('pincc-shape-size-number');
+  const textSizeNumber  = document.getElementById('pincc-text-size-number');
+  // New number input elements for text controls
+  const borderSizeNumber = document.getElementById('pincc-border-size-number');
+  const lineHeightNumber = document.getElementById('pincc-line-height-number');
+  const letterSpacingNumber = document.getElementById('pincc-letter-spacing-number');
+  const curveNumber = document.getElementById('pincc-text-curve-number');
+  const rotationNumber = document.getElementById('pincc-text-rotation-number');
+  // Sync initial values
+  shapeSizeNumber.value = shapeSizeSlLayer.value;
+  textSizeNumber.value  = sizeSl.value;
+  borderSizeNumber.value = borderSl.value;
+  lineHeightNumber.value = lineHeightSl.value;
+  letterSpacingNumber.value = letterSpacingSl.value;
+  curveNumber.value = curveSl.value;
+  rotationNumber.value = rotSl.value;
+  const shapeBgColorInpLayer = document.getElementById('pincc-shape-bg-color');
+  const shapeBgTransparentChk = document.getElementById('pincc-shape-bg-transparent');
+  const shapeBorderColorInpLayer = document.getElementById('pincc-shape-border-color');
+  const shapeBorderWidthSlLayer = document.getElementById('pincc-shape-border-width');
+
+      // limit metal finishes to gold & silver when Photo Dome Pins selected
+      function updateMetalOptions() {
+        const isPhoto = pinTypeSel.value === 'photo';
+        const fullList = [
+          {value:'gold', text:'Gold'},
+          {value:'antique-gold', text:'Antique Gold'},
+          {value:'bronze', text:'Bronze'},
+          {value:'antique-bronze', text:'Antique Bronze'},
+          {value:'copper', text:'Copper'},
+          {value:'antique-copper', text:'Antique Copper'},
+          {value:'silver', text:'Silver'},
+          {value:'antique-silver', text:'Antique Silver'},
+          {value:'black-nickel', text:'Black Nickel'},
+          {value:'black-dye', text:'Black Dye'},
+          {value:'white-dye', text:'White Dye'},
+          {value:'green-dye', text:'Green Dye'},
+          {value:'red-dye', text:'Red Dye'},
+          {value:'blue-dye', text:'Blue Dye'}
+        ];
+        const filtered = isPhoto
+          ? fullList.filter(o => o.value === 'gold' || o.value === 'silver')
+          : fullList;
+        const current = metalSel.value;
+        metalSel.innerHTML = '';
+        filtered.forEach(opt => {
+          const e = document.createElement('option');
+          e.value = opt.value;
+          e.textContent = opt.text;
+          metalSel.appendChild(e);
+        });
+        metalSel.value = filtered.some(o => o.value === current) ? current : filtered[0].value;
+      }
+
+  let layers = [], selIndex = -1;
+
+  // your base colors
+  const metalBase = {
+    'antique-gold':   '#5C472D',
+    'bronze':         '#B38C28',
+    'antique-bronze': '#806553',
+    'copper':         '#DB803A',
+    'antique-copper': '#3D2D20',
+    'antique-silver': '#8A7F77',
+    'black-nickel':   '#AE9F87',
+    'black-dye':      '#2C2929',
+    'white-dye':      '#E8EAEE',
+    'green-dye':      '#2A6F2F',
+    'red-dye':        '#C1060E',
+    'blue-dye':       '#043693'
+  };
+
+  // helper: hex ↔︎ rgb
+  function hexToRgb(hex){
+    hex = hex.replace(/^#/,'');
+    const bigint = parseInt(hex,16);
+    return {
+      r: (bigint>>16)&255,
+      g: (bigint>>8)&255,
+      b: bigint&255
+    };
+  }
+  function rgbToHex(r,g,b){
+    const to2 = n=>n.toString(16).padStart(2,'0');
+    return `#${to2(r)}${to2(g)}${to2(b)}`;
+  }
+  function adjustColor(hex, amt){
+    const c = hexToRgb(hex);
+    return rgbToHex(
+      Math.min(255,Math.max(0,c.r+amt)),
+      Math.min(255,Math.max(0,c.g+amt)),
+      Math.min(255,Math.max(0,c.b+amt))
+    );
+  }
+
+  // build a 3-stop gradient (dark→base→light)
+  function makeGradient(baseColor){
+    const dark   = adjustColor(baseColor,-40),
+          light  = adjustColor(baseColor,+40),
+          grad   = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+    grad.addColorStop(0, dark);
+    grad.addColorStop(0.5, baseColor);
+    grad.addColorStop(1, light);
+    return grad;
+  }
+
+  function getMetalStrokeStyle(){
+    const m = metalSel.value;
+    if(m==='gold'){
+      const g = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+      g.addColorStop(0, '#D4AF37');
+      g.addColorStop(0.5, '#FFD700');
+      g.addColorStop(1, '#B8860B');
+      return g;
+    }
+    if(m==='gold'){
+      const g = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+      g.addColorStop(0, '#D4AF37');
+      g.addColorStop(0.5, '#FFD700');
+      g.addColorStop(1, '#B8860B');
+      return g;
+    }
+    if(m==='silver'){
+      const g = ctx.createLinearGradient(0,0,canvas.width,canvas.height);
+      g.addColorStop(0, '#C0C0C0');
+      g.addColorStop(0.5, '#D3D3D3');
+      g.addColorStop(1, '#A9A9A9');
+      return g;
+    }
+    // any other finish? build from your base map
+    const base = metalBase[m]||'#000000';
+    return makeGradient(base);
+  }
+
+  function drawShapePath(){
+    const w=canvas.width, h=canvas.height;
+    ctx.beginPath();
+    switch(shapeSel.value){
+      case 'circle':   
+        ctx.arc(w/2,h/2,Math.min(w,h)/2-8,0,2*Math.PI);
+        break;
+      case 'oval':     
+        ctx.ellipse(w/2,h/2,w/2-8,h/2-16,0,0,2*Math.PI);
+        break;
+      case 'square':   
+        ctx.rect(8,8,w-16,h-16);
+        break;
+      case 'rectangle':
+        const rw=w-16, rh=h*0.75-16;
+        ctx.rect(8,(h-rh)/2,rw,rh);
+        break;
+    }
+    ctx.closePath();
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    const isPhoto = pinTypeSel.value === 'photo';
+
+    // fill blank
+    ctx.save();
+    drawShapePath();
+    ctx.fillStyle = backgroundColorInp.value;
+    ctx.fill();
+    ctx.restore();
+
+    if(layers.length){
+      ctx.save(); drawShapePath(); ctx.clip();
+      // draw layers in order
+      layers.forEach(L => {
+        if (L.type === 'image') {
+          ctx.save();
+          ctx.filter = `brightness(${L.brightness}%) contrast(${L.contrast}%)`;
+          const w = L.img.width * L.scale,
+                h = L.img.height * L.scale,
+                cx = canvas.width/2,
+                cy = canvas.height/2;
+          ctx.drawImage(L.img, cx - w/2 + L.x, cy - h/2 + L.y, w, h);
+          ctx.restore();
+        } else if (L.type === 'icon') {
+          const cx = canvas.width/2 + L.x,
+                cy = canvas.height/2 + L.y;
+          ctx.save();
+          ctx.translate(cx, cy);
+          ctx.rotate(L.rotation * Math.PI/180);
+          // use emoji for icons
+          ctx.font = `${L.size}px sans-serif`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          // default border for non-photo pins
+          if (!isPhoto) {
+            // dynamic border thickness for icons
+            const strokeWidth = Math.max(1, L.size * 0.05);
+            ctx.lineWidth = strokeWidth;
+            ctx.strokeStyle = getMetalStrokeStyle();
+            ctx.strokeText(L.icon, 0, 0);
+          }
+          ctx.fillStyle = L.color;
+          ctx.fillText(L.icon, 0, 0);
+          ctx.restore();
+        } else if (L.type === 'text') {
+          const isPhoto = pinTypeSel.value === 'photo';
+          let bs = L.borderSize;
+          if (!isPhoto && bs < 1) bs = 1;
+          if (bs > 0) {
+            ctx.save();
+            ctx.lineWidth = bs;
+            ctx.strokeStyle = isPhoto ? L.borderColor : getMetalStrokeStyle();
+          }
+          ctx.save(); drawShapePath(); ctx.clip();
+          const cx = canvas.width/2 + L.x,
+                cy = canvas.height/2 + L.y;
+          ctx.fillStyle = L.color;
+          ctx.textAlign = L.align;
+          ctx.textBaseline = 'middle';
+          ctx.font = `${L.italic?'italic ':''}${L.bold?'bold ':''}${L.fontSize}px ${L.font}`;
+          if (L.curve === 0) {
+            ctx.save();
+            ctx.translate(cx, cy);
+            ctx.rotate(L.rotation * Math.PI / 180);
+            // calculate line height and letter spacing
+            const lines = L.text.split('\n');
+            const lineHeight = L.fontSize * (L.lineHeight || 1);
+            const totalHeight = lines.length * lineHeight;
+            const startY = -totalHeight / 2 + lineHeight / 2;
+            const letterSpacing = L.letterSpacing || 0;
+            // draw each line at relative origin
+            ctx.textBaseline = 'middle';
+            lines.forEach((line, i) => {
+              const y = startY + i * lineHeight;
+              if (letterSpacing !== 0) {
+                // calculate width of this line including letter spacing
+                const lineWidth = ctx.measureText(line).width + letterSpacing * (line.length - 1);
+                // compute x-offset based on text alignment
+                const xOff = L.align === 'left'
+                  ? 0
+                  : L.align === 'center'
+                    ? -lineWidth / 2
+                    : -lineWidth;
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                let x = xOff;
+                for (const ch of line) {
+                  ctx.fillText(ch, x, y);
+                  if (bs > 0) ctx.strokeText(ch, x, y);
+                  x += ctx.measureText(ch).width + letterSpacing;
+                }
+              } else {
+                ctx.textAlign = L.align;
+                ctx.fillText(line, 0, y);
+                if (bs > 0) ctx.strokeText(line, 0, y);
+              }
+            });
+            ctx.restore();
+          } else {
+            const maxR = canvas.height/2 - L.fontSize/2 - 8,
+                  pct = Math.min(Math.abs(L.curve)/100, 0.99),
+                  rMag = maxR * (1 - pct),
+                  dir = L.curve > 0 ? 1 : -1,
+                  textWidth = ctx.measureText(L.text).width;
+            let theta = -textWidth / (2 * rMag) * dir + L.rotation * Math.PI / 180;
+            ctx.translate(cx, cy);
+            for (let ch of L.text) {
+              const w = ctx.measureText(ch).width,
+                    a = w / rMag;
+              theta += (a/2) * dir;
+              ctx.save();
+              ctx.rotate(theta);
+              ctx.fillText(ch, 0, -dir * rMag);
+              if (bs > 0) ctx.strokeText(ch, 0, -dir * rMag);
+              ctx.restore();
+              theta += (a/2) * dir;
+            }
+          }
+          ctx.restore();
+          if (bs > 0) ctx.restore();
+        } else if (L.type === 'shape') {
+          ctx.save();
+          ctx.translate(canvas.width/2 + L.x, canvas.height/2 + L.y);
+          ctx.beginPath();
+          const half = L.size / 2;
+          if (L.shape === 'circle') ctx.arc(0, 0, half, 0, 2 * Math.PI);
+          else ctx.rect(-half, -half, L.size, L.size);
+          if (L.bgColor) {
+            ctx.fillStyle = L.bgColor;
+            ctx.fill();
+          }
+          if (L.borderWidth > 0) {
+            let bw = L.borderWidth;
+            if (!isPhoto && bw < 1) bw = 1;
+            ctx.lineWidth = bw;
+            ctx.strokeStyle = (pinTypeSel.value === 'photo') ? L.borderColor : getMetalStrokeStyle();
+            ctx.stroke();
+          }
+          ctx.restore();
+        }
+      });
+      ctx.restore();
+    }
+    // outer rim
+    drawShapePath();
+    ctx.lineWidth = 12;
+    ctx.strokeStyle = getMetalStrokeStyle();
+    ctx.stroke();
+  }
+
+  function refresh(){
+    layerSel.innerHTML = '';
+    const isPhoto = pinTypeSel.value === 'photo';
+    if(!layers.length){
+      const o=document.createElement('option');
+      o.disabled=o.selected=true;
+      o.textContent='-- No Layers --';
+      layerSel.appendChild(o);
+      selIndex=-1;
+      // Sync icon number inputs
+      iconSizeNumber.value = iconSizeSl.value;
+      iconRotationNumber.value = iconRotSl.value;
+    } else {
+      layers.forEach((L, i) => {
+        const o = document.createElement('option');
+        o.value = i;
+        if (L.type === 'text') {
+          o.textContent = L.text;
+        } else if (L.type === 'image') {
+          if (L.isBackground) {
+            o.textContent = 'Background Image';
+          } else {
+            o.textContent = `Image ${i+1}`;
+          }
+        } else if (L.type === 'icon') {
+          o.textContent = `Icon: ${L.icon}`;
+        }
+        else if (L.type === 'shape') {
+          o.textContent = `Shape ${i+1}: ${L.shape}`;
+        }
+        layerSel.appendChild(o);
+      });
+      if(selIndex<0||selIndex>=layers.length) selIndex=layers.length-1;
+      layerSel.value=selIndex;
+    }
+    updateControls();
+    draw();
+    // toggle visibility classes
+    const wrapper = document.querySelector('.pincc-wrapper');
+    if (layers.length > 0) wrapper.classList.add('has-layers');
+    else wrapper.classList.remove('has-layers');
+  }
+
+  function updateControls(){
+    const L = layers[selIndex];
+    delBtn.disabled     = selIndex<0;
+    dupBtn.disabled     = selIndex<0;
+    moveUpBtn.disabled   = selIndex <= 0;
+    moveDownBtn.disabled = selIndex < 0 || selIndex >= layers.length - 1;
+    resetBtn.disabled   = !(L&&L.type==='image');
+    brightSl.disabled   = resetBtn.disabled;
+    contrastSl.disabled = resetBtn.disabled;
+    // image size slider follows same enable/disable logic as filters
+    imageSizeSl.disabled = resetBtn.disabled;
+    if (L && L.type === 'image') {
+      // sync slider to current scale
+      imageSizeSl.value = (L.scale || 1) * 100;
+      backgroundChk.disabled = false;
+      backgroundChk.checked = !!L.isBackground;
+    } else {
+      backgroundChk.disabled = true;
+      backgroundChk.checked = false;
+      imageSizeSl.disabled = true;
+    }
+
+    // show or hide image controls based on layer type
+    const imgControls = document.querySelector('.pincc-image-controls');
+    if (L && L.type === 'image') {
+      imgControls.style.display = 'flex';
+    } else {
+      imgControls.style.display = 'none';
+    }
+
+    // icon controls visibility
+    if (L && L.type === 'icon') {
+      iconCtrls.style.display = 'flex';
+      iconSelect.value     = L.icon;
+      iconColorInp.value   = L.color;
+      iconSizeSl.value     = L.size;
+      iconRotSl.value      = L.rotation;
+    } else {
+      iconCtrls.style.display = 'none';
+    }
+
+    if(L&&L.type==='text'){
+      txtCtrls.style.display     = 'flex';
+      txtInput.value             = L.text;
+      fontSel.value              = L.font;
+      sizeSl.value               = L.fontSize;
+      colorInp.value             = L.color;
+      borderSl.value             = L.borderSize;
+      borderColorInp.value       = L.borderColor;
+      curveSl.value              = L.curve;
+      rotSl.value                = L.rotation;
+      lineHeightSl.value         = L.lineHeight || 1;
+      letterSpacingSl.value      = L.letterSpacing || 0;
+      resetCurveBtn.disabled     = L.curve===0;
+      boldBtn.classList.toggle('active',L.bold);
+      italicBtn.classList.toggle('active',L.italic);
+      resetRotationBtn.disabled      = L.rotation === 0;
+      resetLineHeightBtn.disabled    = (L.lineHeight || 1) === 1;
+      resetLetterSpacingBtn.disabled = (L.letterSpacing || 0) === 0;
+      // hide manual border color picker when not Photo Dome Pins
+      const borderLabel = borderColorInp.parentElement;
+      if (pinTypeSel.value !== 'photo') {
+        borderLabel.style.display = 'none';
+      } else {
+        borderLabel.style.display = 'flex';
+      }
+    } else {
+      txtCtrls.style.display = 'none';
+    }
+    if (L && L.type === 'shape') {
+      shapeCtrls.style.display = 'flex';
+      shapeTypeSelLayer.value = L.shape;
+      shapeSizeSlLayer.value = L.size;
+      shapeBgColorInpLayer.value = L.bgColor || '#ffffff';
+      shapeBgTransparentChk.checked = !L.bgColor;
+      shapeBorderColorInpLayer.value = L.borderColor;
+      shapeBorderWidthSlLayer.value = L.borderWidth;
+    } else {
+      shapeCtrls.style.display = 'none';
+    }
+  }
+
+  // Upload
+  upload.addEventListener('change', e=>{
+    Array.from(e.target.files).forEach(f=>{
+      const fr=new FileReader();
+      fr.onload=()=>{
+        const img=new Image();
+        img.onload=()=>{
+          layers.push({ type:'image', img, x:0, y:0, scale:1, brightness:100, contrast:100 });
+          selIndex = layers.length - 1;
+          refresh();
+        };
+        img.src=fr.result;
+      };
+      fr.readAsDataURL(f);
+    });
+    upload.value='';
+  });
+
+  // Add text
+  addText.addEventListener('click', ()=>{
+    layers.push({
+      type:       'text',
+      text:       'New Text',
+      x:          0,
+      y:          0,
+      fontSize:   24,
+      font:       'Arial',
+      color:      '#FF8361',
+      borderSize: 0,
+      borderColor:'#000000',
+      curve:      0,
+      rotation:   0,
+      bold:       false,
+      italic:     false,
+      align:      'center',
+    });
+    selIndex = layers.length - 1;
+    refresh();
+    txtInput.focus();
+  });
+
+  // Add icon
+  addIconBtn.addEventListener('click', () => {
+    layers.push({
+      type:     'icon',
+      icon:     iconSelect.value,
+      x:        0,
+      y:        0,
+      color:    iconColorInp.value,
+      size:     +iconSizeSl.value,
+      rotation: +iconRotSl.value
+    });
+    selIndex = layers.length - 1;
+    refresh();
+  });
+  // Add shape
+  addShapeBtn.addEventListener('click', () => {
+    layers.push({
+      type: 'shape',
+      shape: 'circle', x:0, y:0,
+      size: 100,
+      bgColor: '#FF8361',
+      borderColor: '#000000',
+      borderWidth: 1
+    });
+    selIndex = layers.length - 1;
+    refresh();
+  });
+
+  // Icon controls listeners
+  iconSelect.addEventListener('change', () => {
+    if (selIndex<0 || layers[selIndex].type!=='icon') return;
+    layers[selIndex].icon = iconSelect.value; draw();
+  });
+  iconColorInp.addEventListener('input', () => {
+    if (selIndex<0 || layers[selIndex].type!=='icon') return;
+    layers[selIndex].color = iconColorInp.value; draw();
+  });
+  // Icon controls: slider <-> number sync
+  iconSizeSl.addEventListener('input', () => {
+    if (selIndex<0 || layers[selIndex].type!=='icon') return;
+    layers[selIndex].size = +iconSizeSl.value;
+    iconSizeNumber.value = iconSizeSl.value;
+    draw();
+  });
+  iconSizeNumber.addEventListener('input', () => {
+    if (selIndex<0 || layers[selIndex].type!=='icon') return;
+    let val = +iconSizeNumber.value;
+    if (val < 16) val = 16;
+    if (val > 200) val = 200;
+    iconSizeNumber.value = val;
+    iconSizeSl.value = val;
+    layers[selIndex].size = val;
+    draw();
+  });
+  iconRotSl.addEventListener('input', () => {
+    if (selIndex<0 || layers[selIndex].type!=='icon') return;
+    layers[selIndex].rotation = +iconRotSl.value;
+    iconRotationNumber.value = iconRotSl.value;
+    draw();
+  });
+  iconRotationNumber.addEventListener('input', () => {
+    if (selIndex<0 || layers[selIndex].type!=='icon') return;
+    let val = +iconRotationNumber.value;
+    if (val < -180) val = -180;
+    if (val > 180) val = 180;
+    iconRotationNumber.value = val;
+    iconRotSl.value = val;
+    layers[selIndex].rotation = val;
+    draw();
+  });
+
+  // Layer select / delete
+  layerSel.addEventListener('change', ()=>{ selIndex=parseInt(layerSel.value,10); updateControls(); });
+  delBtn.addEventListener('click', ()=>{
+    if(selIndex<0) return;
+    layers.splice(selIndex,1);
+    selIndex=-1;
+    refresh();
+  });
+
+  moveUpBtn.addEventListener('click', () => {
+    if (selIndex > 0) {
+      [layers[selIndex - 1], layers[selIndex]] = [layers[selIndex], layers[selIndex - 1]];
+      selIndex--;
+      refresh();
+    }
+  });
+  moveDownBtn.addEventListener('click', () => {
+    if (selIndex < layers.length - 1) {
+      [layers[selIndex + 1], layers[selIndex]] = [layers[selIndex], layers[selIndex + 1]];
+      selIndex++;
+      refresh();
+    }
+  });
+  dupBtn.addEventListener('click', () => {
+    if (selIndex < 0) return;
+    const L = layers[selIndex];
+    const copy = { ...L };
+    layers.splice(selIndex + 1, 0, copy);
+    selIndex++;
+    refresh();
+  });
+  alignCenterBtn.addEventListener('click', () => {
+    if (selIndex < 0) return;
+    const L = layers[selIndex];
+    let offsetX = 0;
+    if (L.type === 'text') {
+      ctx.save();
+      ctx.font = `${L.italic ? 'italic ' : ''}${L.bold ? 'bold ' : ''}${L.fontSize}px ${L.font}`;
+      const lines = L.text.split('\n');
+      const letterSpacing = L.letterSpacing || 0;
+      const widths = lines.map(line =>
+        ctx.measureText(line).width + letterSpacing * (line.length - 1)
+      );
+      const maxWidth = Math.max(...widths);
+      ctx.restore();
+      if (L.align === 'left') {
+        offsetX = -maxWidth / 2;
+      } else if (L.align === 'right') {
+        offsetX = maxWidth / 2;
+      }
+    }
+    L.x = offsetX;
+    L.y = 0;
+    refresh();
+  });
+  alignHorizontalBtn.addEventListener('click', () => {
+    if (selIndex < 0) return;
+    layers[selIndex].y = 0;
+    refresh();
+  });
+  alignLeftBtn.addEventListener('click', () => {
+    if (selIndex < 0) return;
+    const L = layers[selIndex];
+    // measure layer width for repositioning
+    ctx.save();
+    if (L.type === 'text') {
+      ctx.font = `${L.italic ? 'italic ' : ''}${L.bold ? 'bold ' : ''}${L.fontSize}px ${L.font}`;
+    }
+    const letterSpacing = (L.type === 'text' ? (L.letterSpacing || 0) : 0);
+    let layerWidth;
+    if (L.type === 'image') {
+      layerWidth = L.img.width * L.scale;
+    } else if (L.type === 'icon') {
+      layerWidth = L.size;
+    } else if (L.type === 'text') {
+      layerWidth = L.text.split('\n').reduce((max, line) => {
+        const raw = ctx.measureText(line).width;
+        const spaced = raw + letterSpacing * (line.length - 1);
+        return Math.max(max, spaced);
+      }, 0);
+    }
+    ctx.restore();
+    // compute left edge offset based on type and text-align
+    let minX;
+    if (L.type === 'image' || L.type === 'icon') {
+      minX = -layerWidth / 2;
+    } else {
+      // uncurved text only
+      minX = L.align === 'left'
+        ? 0
+        : L.align === 'center'
+          ? -layerWidth / 2
+          : -layerWidth;
+    }
+    // pin's inner left boundary
+    const shapeLeft = 8;
+    // new x so that (canvasCenter + x + minX) == shapeLeft
+    L.x = shapeLeft - minX - canvas.width / 2;
+    refresh();
+  });
+  alignRightBtn.addEventListener('click', () => {
+    if (selIndex < 0) return;
+    const L = layers[selIndex];
+    if (L.type === 'text' && L.letterSpacing) {
+      // measure widest letter-spaced line and align right
+      ctx.save();
+      ctx.font = `${L.italic?'italic ':''}${L.bold?'bold ':''}${L.fontSize}px ${L.font}`;
+      const linesRS = L.text.split('\n');
+      const lsR = L.letterSpacing;
+      let maxWR = 0;
+      for (const line of linesRS) {
+        let wLineR = 0;
+        for (const ch of line) {
+          wLineR += ctx.measureText(ch).width + lsR;
+        }
+        if (line.length > 0) wLineR -= lsR;
+        maxWR = Math.max(maxWR, wLineR);
+      }
+      ctx.restore();
+      const offsetR = canvas.width / 2 - maxWR / 2;
+      L.x = offsetR;
+    } else {
+      let halfW;
+      if (L.type === 'image') {
+        halfW = (L.img.width * L.scale) / 2;
+      } else if (L.type === 'icon') {
+        halfW = L.size / 2;
+      } else {
+        ctx.save();
+        ctx.font = `${L.italic?'italic ':''}${L.bold?'bold ':''}${L.fontSize}px ${L.font}`;
+        const textWidth = ctx.measureText(L.text).width;
+        ctx.restore();
+        halfW = textWidth / 2;
+      }
+      L.x = (canvas.width / 2 - halfW);
+    }
+    refresh();
+  });
+
+  alignTopBtn.addEventListener('click', () => {
+    if (selIndex < 0) return;
+    const L = layers[selIndex];
+    let halfH;
+    if (L.type === 'image') {
+      halfH = (L.img.height * L.scale) / 2;
+    } else if (L.type === 'icon') {
+      halfH = L.size / 2;
+    } else if (L.type === 'text') {
+      const lines = L.text.split('\n');
+      const lineHeight = L.fontSize * (L.lineHeight || 1);
+      halfH = (lines.length * lineHeight) / 2;
+    }
+    // Dynamic border offset based on shape
+    let borderOffset;
+    switch (shapeSel.value) {
+      case 'circle':
+      case 'square':
+        borderOffset = 8;
+        break;
+      case 'oval':
+        borderOffset = 16;
+        break;
+      case 'rectangle':
+        // For rectangle: vertical inset = (canvas.height*0.25 + 16) / 2 = canvas.height*0.125 + 8
+        borderOffset = canvas.height * 0.125 + 8;
+        break;
+      default:
+        borderOffset = 8;
+    }
+    layers[selIndex].y = -(canvas.height / 2 - borderOffset - halfH);
+    refresh();
+  });
+  alignBottomBtn.addEventListener('click', () => {
+    if (selIndex < 0) return;
+    const L = layers[selIndex];
+    let halfH;
+    if (L.type === 'image') {
+      halfH = (L.img.height * L.scale) / 2;
+    } else if (L.type === 'icon') {
+      halfH = L.size / 2;
+    } else if (L.type === 'text') {
+      const lines = L.text.split('\n');
+      const lineHeight = L.fontSize * (L.lineHeight || 1);
+      halfH = (lines.length * lineHeight) / 2;
+    }
+    // Dynamic border offset based on shape
+    let borderOffset;
+    switch (shapeSel.value) {
+      case 'circle':
+      case 'square':
+        borderOffset = 8;
+        break;
+      case 'oval':
+        borderOffset = 16;
+        break;
+      case 'rectangle':
+        // For rectangle: vertical inset = (canvas.height*0.25 + 16) / 2 = canvas.height*0.125 + 8
+        borderOffset = canvas.height * 0.125 + 8;
+        break;
+      default:
+        borderOffset = 8;
+    }
+    layers[selIndex].y = (canvas.height / 2 - borderOffset - halfH);
+    refresh();
+  });
+
+  // Text‐layer align buttons
+  textAlignLeftBtn.addEventListener('click', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    const L = layers[selIndex];
+    // measure text width including letter spacing
+    ctx.save();
+    ctx.font = `${L.italic?'italic ':''}${L.bold?'bold ':''}${L.fontSize}px ${L.font}`;
+    const lines = L.text.split('\n');
+    const letterSpacing = L.letterSpacing || 0;
+    const widths = lines.map(line =>
+      letterSpacing !== 0
+        ? ctx.measureText(line).width + letterSpacing * (line.length - 1)
+        : ctx.measureText(line).width
+    );
+    const maxWidth = Math.max(...widths);
+    ctx.restore();
+    // compute old and new alignment offsets
+    const offsetOld = L.align === 'left'   ? 0
+                    : L.align === 'center' ? -maxWidth / 2
+                    : -maxWidth;
+    const offsetNew = 0; // left align pivot at left edge
+    // adjust layer x to keep text in place
+    L.x += offsetOld - offsetNew;
+    // apply new alignment
+    L.align = 'left';
+    refresh();
+  });
+
+  textAlignCenterBtn.addEventListener('click', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    const L = layers[selIndex];
+    ctx.save();
+    ctx.font = `${L.italic?'italic ':''}${L.bold?'bold ':''}${L.fontSize}px ${L.font}`;
+    const lines = L.text.split('\n');
+    const letterSpacing = L.letterSpacing || 0;
+    const widths = lines.map(line =>
+      letterSpacing !== 0
+        ? ctx.measureText(line).width + letterSpacing * (line.length - 1)
+        : ctx.measureText(line).width
+    );
+    const maxWidth = Math.max(...widths);
+    ctx.restore();
+    const offsetOld = L.align === 'left'   ? 0
+                    : L.align === 'center' ? -maxWidth / 2
+                    : -maxWidth;
+    const offsetNew = -maxWidth / 2; // center align pivot
+    L.x += offsetOld - offsetNew;
+    L.align = 'center';
+    refresh();
+  });
+
+  textAlignRightBtn.addEventListener('click', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    const L = layers[selIndex];
+    ctx.save();
+    ctx.font = `${L.italic?'italic ':''}${L.bold?'bold ':''}${L.fontSize}px ${L.font}`;
+    const lines = L.text.split('\n');
+    const letterSpacing = L.letterSpacing || 0;
+    const widths = lines.map(line =>
+      letterSpacing !== 0
+        ? ctx.measureText(line).width + letterSpacing * (line.length - 1)
+        : ctx.measureText(line).width
+    );
+    const maxWidth = Math.max(...widths);
+    ctx.restore();
+    const offsetOld = L.align === 'left'   ? 0
+                    : L.align === 'center' ? -maxWidth / 2
+                    : -maxWidth;
+    const offsetNew = -maxWidth; // right align pivot at right edge
+    L.x += offsetOld - offsetNew;
+    L.align = 'right';
+    refresh();
+  });
+
+  // Filters
+  // Image controls: slider <-> number sync
+  resetBtn.addEventListener('click', ()=>{
+    if(selIndex<0||layers[selIndex].type!=='image') return;
+    layers[selIndex].brightness=100;
+    layers[selIndex].contrast=100;
+    brightSl.value=contrastSl.value=100;
+    brightNumber.value=contrastNumber.value=100;
+    draw();
+  });
+  brightSl.addEventListener('input', ()=>{
+    if (selIndex<0 || layers[selIndex].type!=='image') return;
+    layers[selIndex].brightness=+brightSl.value;
+    brightNumber.value = brightSl.value;
+    draw();
+  });
+  brightNumber.addEventListener('input', ()=>{
+    if (selIndex<0 || layers[selIndex].type!=='image') return;
+    let val = +brightNumber.value;
+    if (val < 0) val = 0;
+    if (val > 200) val = 200;
+    brightNumber.value = val;
+    brightSl.value = val;
+    layers[selIndex].brightness = val;
+    draw();
+  });
+  contrastSl.addEventListener('input', ()=>{
+    if (selIndex<0 || layers[selIndex].type!=='image') return;
+    layers[selIndex].contrast=+contrastSl.value;
+    contrastNumber.value = contrastSl.value;
+    draw();
+  });
+  contrastNumber.addEventListener('input', ()=>{
+    if (selIndex<0 || layers[selIndex].type!=='image') return;
+    let val = +contrastNumber.value;
+    if (val < 0) val = 0;
+    if (val > 200) val = 200;
+    contrastNumber.value = val;
+    contrastSl.value = val;
+    layers[selIndex].contrast = val;
+    draw();
+  });
+  imageSizeSl.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'image') return;
+    layers[selIndex].scale = +imageSizeSl.value / 100;
+    imageSizeNumber.value = imageSizeSl.value;
+    draw();
+  });
+  imageSizeNumber.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'image') return;
+    let val = +imageSizeNumber.value;
+    if (val < 10) val = 10;
+    if (val > 500) val = 500;
+    imageSizeNumber.value = val;
+    imageSizeSl.value = val;
+    layers[selIndex].scale = val / 100;
+    draw();
+  });
+  backgroundChk.addEventListener('change', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'image') return;
+    const L = layers[selIndex];
+    // clear any existing background flags
+    layers.forEach(layer => { if (layer !== L) delete layer.isBackground; });
+    // remove this layer from array
+    layers.splice(selIndex, 1);
+    if (backgroundChk.checked) {
+      // make this the single background layer at bottom
+      L.isBackground = true;
+      layers.unshift(L);
+      selIndex = 0;
+    } else {
+      // remove background role, send to top
+      delete L.isBackground;
+      layers.push(L);
+      selIndex = layers.length - 1;
+    }
+    refresh();
+  });
+
+  // Text controls
+  txtInput.addEventListener('input', () => {
+    layers[selIndex].text = txtInput.value;
+    // update dropdown label immediately
+    const option = layerSel.options[selIndex];
+    if (option) option.textContent = layers[selIndex].text;
+    draw();
+  });
+  fontSel .addEventListener('change', ()=>{ layers[selIndex].font=fontSel.value; draw(); });
+  sizeSl  .addEventListener('input', ()=>{
+    layers[selIndex].fontSize=+sizeSl.value; draw();
+    textSizeNumber.value = sizeSl.value;
+  });
+  textSizeNumber.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    sizeSl.value = textSizeNumber.value;
+    layers[selIndex].fontSize = +textSizeNumber.value;
+    draw();
+  });
+  // Border Size slider <-> number sync
+  borderSl.addEventListener('input', () => {
+    layers[selIndex].borderSize = +borderSl.value; draw();
+    borderSizeNumber.value = borderSl.value;
+  });
+  borderSizeNumber.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    borderSl.value = borderSizeNumber.value;
+    layers[selIndex].borderSize = +borderSizeNumber.value;
+    draw();
+  });
+  colorInp.addEventListener('input', ()=>{ layers[selIndex].color=colorInp.value; draw(); });
+  borderColorInp.addEventListener('input', ()=>{ layers[selIndex].borderColor=borderColorInp.value; draw(); });
+  // (removed old alignSel change listener)
+  // Line Height slider <-> number sync
+  lineHeightSl.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    layers[selIndex].lineHeight = +lineHeightSl.value;
+    lineHeightNumber.value = lineHeightSl.value;
+    updateControls();
+    draw();
+  });
+  lineHeightNumber.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    lineHeightSl.value = lineHeightNumber.value;
+    layers[selIndex].lineHeight = +lineHeightNumber.value;
+    updateControls();
+    draw();
+  });
+  // Letter Spacing slider <-> number sync
+  letterSpacingSl.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    layers[selIndex].letterSpacing = +letterSpacingSl.value;
+    letterSpacingNumber.value = letterSpacingSl.value;
+    updateControls();
+    draw();
+  });
+  letterSpacingNumber.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    letterSpacingSl.value = letterSpacingNumber.value;
+    layers[selIndex].letterSpacing = +letterSpacingNumber.value;
+    updateControls();
+    draw();
+  });
+  // Curve slider <-> number sync
+  curveSl.addEventListener('input', ()=>{
+    layers[selIndex].curve = +curveSl.value;
+    curveNumber.value = curveSl.value;
+    resetCurveBtn.disabled = layers[selIndex].curve === 0;
+    draw();
+  });
+  curveNumber.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    curveSl.value = curveNumber.value;
+    layers[selIndex].curve = +curveNumber.value;
+    resetCurveBtn.disabled = layers[selIndex].curve === 0;
+    draw();
+  });
+  // Rotation slider <-> number sync
+  rotSl.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    layers[selIndex].rotation = +rotSl.value;
+    rotationNumber.value = rotSl.value;
+    updateControls();
+    draw();
+  });
+  rotationNumber.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    rotSl.value = rotationNumber.value;
+    layers[selIndex].rotation = +rotationNumber.value;
+    updateControls();
+    draw();
+  });
+
+  resetCurveBtn.addEventListener('click', ()=>{
+    if(selIndex<0||layers[selIndex].type!=='text') return;
+    layers[selIndex].curve=0;
+    curveSl.value=0;
+    resetCurveBtn.disabled=true;
+    draw();
+  });
+
+  boldBtn.addEventListener('click', ()=>{
+    const L=layers[selIndex];
+    if(!L||L.type!=='text') return;
+    L.bold=!L.bold; updateControls(); draw();
+  });
+  italicBtn.addEventListener('click', ()=>{
+    const L=layers[selIndex];
+    if(!L||L.type!=='text') return;
+    L.italic=!L.italic; updateControls(); draw();
+  });
+
+  resetRotationBtn.addEventListener('click', () => {
+    if (selIndex<0 || layers[selIndex].type !== 'text') return;
+    layers[selIndex].rotation = 0;
+    rotSl.value = 0;
+    resetRotationBtn.disabled = true;
+    draw();
+  });
+  resetLineHeightBtn.addEventListener('click', () => {
+    if (selIndex<0 || layers[selIndex].type !== 'text') return;
+    layers[selIndex].lineHeight = 1;
+    lineHeightSl.value = 1;
+    resetLineHeightBtn.disabled = true;
+    draw();
+  });
+  resetLetterSpacingBtn.addEventListener('click', () => {
+    if (selIndex<0 || layers[selIndex].type !== 'text') return;
+    layers[selIndex].letterSpacing = 0;
+    letterSpacingSl.value = 0;
+    resetLetterSpacingBtn.disabled = true;
+    draw();
+  });
+
+  // Pan/zoom
+  let dragging=false, start={}, orig={};
+  canvas.addEventListener('mousedown', e=>{
+    if(selIndex<0) return;
+    dragging=true; canvas.classList.add('dragging');
+    start={x:e.clientX,y:e.clientY};
+    orig={x:layers[selIndex].x,y:layers[selIndex].y};
+  });
+  window.addEventListener('mousemove', e=>{
+    if(!dragging||selIndex<0) return;
+    layers[selIndex].x=orig.x+(e.clientX-start.x);
+    layers[selIndex].y=orig.y+(e.clientY-start.y);
+    draw();
+  });
+  window.addEventListener('mouseup', () => {
+    dragging = false;
+    canvas.classList.remove('dragging');
+  });
+
+  canvas.addEventListener('wheel', e=>{
+    if(selIndex<0) return;
+    const L=layers[selIndex];
+    if(L.type==='image'){
+      e.preventDefault();
+      const old=L.scale, d=-e.deltaY*0.001;
+      L.scale=Math.min(Math.max(0.1,old+d),10);
+      const rect=canvas.getBoundingClientRect(),
+            mx=e.clientX-rect.left-canvas.width/2-L.x,
+            my=e.clientY-rect.top-canvas.height/2-L.y;
+      L.x-=mx*(L.scale/old-1);
+      L.y-=my*(L.scale/old-1);
+      draw();
+    }
+  });
+
+  // Redraw on basic-option changes
+  shapeSel.addEventListener('change', draw);
+  metalSel.addEventListener('change', draw);
+  pinTypeSel.addEventListener('change', draw);
+  pinTypeSel.addEventListener('change', updateControls);
+  pinTypeSel.addEventListener('change', updateMetalOptions);
+  backgroundColorInp.addEventListener('input', draw);
+
+  // Shape controls listeners
+  shapeTypeSelLayer.addEventListener('change', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'shape') return;
+    layers[selIndex].shape = shapeTypeSelLayer.value; draw();
+  });
+  shapeSizeSlLayer.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'shape') return;
+    layers[selIndex].size = +shapeSizeSlLayer.value; draw();
+    shapeSizeNumber.value = shapeSizeSlLayer.value;
+  });
+  shapeSizeNumber.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'shape') return;
+    shapeSizeSlLayer.value = shapeSizeNumber.value;
+    layers[selIndex].size = +shapeSizeNumber.value;
+    draw();
+  });
+  shapeBgColorInpLayer.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'shape') return;
+    if (!shapeBgTransparentChk.checked) layers[selIndex].bgColor = shapeBgColorInpLayer.value;
+    draw();
+  });
+  shapeBgTransparentChk.addEventListener('change', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'shape') return;
+    layers[selIndex].bgColor = shapeBgTransparentChk.checked ? null : shapeBgColorInpLayer.value;
+    draw();
+  });
+  shapeBorderColorInpLayer.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'shape') return;
+    layers[selIndex].borderColor = shapeBorderColorInpLayer.value; draw();
+  });
+  shapeBorderWidthSlLayer.addEventListener('input', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'shape') return;
+    layers[selIndex].borderWidth = +shapeBorderWidthSlLayer.value; draw();
+  });
+
+  // Initialize
+  updateMetalOptions();
+  refresh();
+
+});
+</script>
