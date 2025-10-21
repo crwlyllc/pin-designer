@@ -1,3 +1,8 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 <!-- Iconify + 2D Photo-Dome Pin Configurator: Blank Fill + Images, Text, Icons & Filters -->
 
 
@@ -103,8 +108,8 @@
     justify-content: flex-start;
   }
   .pincc-text-controls .pincc-text-col {
-    flex: 0 0 calc(50% - 6px);
-    max-width: calc(50% - 6px);
+    flex: 1 1 100%;
+    max-width: 100%;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -188,7 +193,7 @@
     gap: 12px;
     width: 100%;
     /* prevent children from wrapping */
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
   }
   /* allow file input label to shrink so button stays on same line */
   .pincc-file-text-group .pincc-label {
@@ -253,7 +258,55 @@
      font-size: 20px;
      line-height: 1;
    }
+  /* --- Mobile-first/reset improvements --- */
+  html, body { margin: 0; -webkit-text-size-adjust: 100%; }
+  :root { --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; }
+  /* Slightly tighter default padding on small screens; desktop overrides below */
+  .pincc-wrapper { padding: var(--space-5) var(--space-4); }
+  /* Ensure the canvas never exceeds the viewport height on phones while staying square */
+  .pincc-canvas { max-width: 100%; height: auto; max-height: 70vh; }
+  /* Make tap targets friendlier */
+  .pincc-button, .pincc-select, .pincc-file-input { min-height: 44px; }
+  .pincc-align-button { width: 44px; height: 44px; }
+  /* Prevent tiny text areas; make inputs/selects fill available width by default on mobile */
+  .pincc-select, .pincc-text-input, .pincc-file-input { width: 100%; max-width: 100%; }
+
+  /* Let the upload + add buttons wrap on narrow screens instead of overflowing */
+  @media (max-width: 767px) {
+    .pincc-wrapper { flex-direction: column; align-items: stretch; text-align: left; padding: var(--space-4) var(--space-4); }
+    .pincc-basic-options { justify-content: stretch; gap: var(--space-4); }
+    .pincc-group { justify-content: stretch; }
+
+    /* Stack the two text columns into one on phones */
+    .pincc-text-controls .pincc-text-col { flex: 1 1 100%; max-width: 100%; }
+
+    /* Allow the top row to wrap; make buttons full-width for easier tapping */
+    .pincc-file-text-group { flex-wrap: wrap; gap: var(--space-3); }
+    .pincc-file-text-group .pincc-label { flex: 1 1 100%; }
+    .pincc-file-text-group .pincc-button { flex: 1 1 100%; width: 100%; }
+
+    /* Controls: use the full width so nothing overflows */
+    .pincc-controls { align-items: stretch; justify-content: stretch; }
+    .pincc-controls .pincc-button, .pincc-controls .pincc-select, .pincc-controls .pincc-text-input { width: 100%; }
+
+    /* Keep the align/move rows scrollable horizontally if they overflow */
+    .pincc-move-buttons { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .pincc-move-row, .pincc-align-row { justify-content: flex-start; min-width: max-content; }
+  }
+
+  /* Desktop/tablet enhancements */
+  @media (min-width: 768px) {
+    .pincc-wrapper { padding: 48px 24px; }
+    .pincc-controls { margin-left: 32px; }
+  }
+
+  /* Respect iOS safe areas when applicable */
+  @supports (padding: max(0px)) {
+    body { padding-left: max(0px, env(safe-area-inset-left)); padding-right: max(0px, env(safe-area-inset-right)); }
+  }
 </style>
+</head>
+<body>
 
 
 <div class="pincc-wrapper">
@@ -1758,3 +1811,5 @@ document.addEventListener('DOMContentLoaded', function(){
 
 });
 </script>
+</body>
+</html>
