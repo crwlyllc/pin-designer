@@ -87,6 +87,11 @@
     display: flex; flex-direction: column;
     font-size: 14px; color: #333;
   }
+  .pincc-helper-text {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+  }
   /* Checkbox labels should be inline and centered */
   .pincc-checkbox-label {
     display: flex;
@@ -459,7 +464,15 @@
           <option value="☾">☾</option>
         </select>
       </label>
-      <label class="pincc-label">Color
+      <label class="pincc-label">Fill Type
+        <select id="pincc-icon-fill-type" class="pincc-select">
+          <option value="color">Use Color</option>
+          <option value="metal-raised">Metal Fill — Raised</option>
+          <option value="metal-recessed">Metal Fill — Recessed</option>
+        </select>
+        <small class="pincc-helper-text">Raised metal sits above the enamel; recessed metal is etched below.</small>
+      </label>
+      <label class="pincc-label" id="pincc-icon-color-label">Color
         <input type="color" id="pincc-icon-color" class="pincc-color-input" value="#000000">
       </label>
       <label class="pincc-label">Size
@@ -483,9 +496,17 @@
         <input type="range" id="pincc-shape-size" class="pincc-slider" min="10" max="500" value="100">
         <input type="number" id="pincc-shape-size-number" class="pincc-text-input" style="width: 60px; margin-left: 8px;" value="100">
       </label>
-      <label class="pincc-label">Background Color
+      <label class="pincc-label">Fill Type
+        <select id="pincc-shape-fill-type" class="pincc-select">
+          <option value="color">Color Fill</option>
+          <option value="metal-raised">Metal Fill — Raised</option>
+          <option value="metal-recessed">Metal Fill — Recessed</option>
+          <option value="none">Transparent / No Fill</option>
+        </select>
+        <small class="pincc-helper-text">Raised metal catches the light; recessed metal sits below the surface.</small>
+      </label>
+      <label class="pincc-label" id="pincc-shape-fill-color-label">Fill Color
         <input type="color" id="pincc-shape-bg-color" class="pincc-color-input" value="#FF8361">
-        <label class="pincc-checkbox-label"><input type="checkbox" id="pincc-shape-bg-transparent"> Transparent</label>
       </label>
       <label class="pincc-label">Border Color
         <input type="color" id="pincc-shape-border-color" class="pincc-color-input" value="#000000">
@@ -528,7 +549,15 @@
           <button id="pincc-text-bold" class="pincc-button"><strong>B</strong></button>
           <button id="pincc-text-italic" class="pincc-button"><em>I</em></button>
         </div>
-        <label class="pincc-label">Color
+        <label class="pincc-label">Fill Type
+          <select id="pincc-text-fill-type" class="pincc-select">
+            <option value="color">Use Color</option>
+            <option value="metal-raised">Metal Fill — Raised</option>
+            <option value="metal-recessed">Metal Fill — Recessed</option>
+          </select>
+          <small class="pincc-helper-text">Raised metal sits above the enamel; recessed metal is etched below.</small>
+        </label>
+        <label class="pincc-label" id="pincc-text-color-label">Color
           <input type="color" id="pincc-text-color" class="pincc-color-input" value="#000000">
         </label>
         <label class="pincc-label">Border Color
@@ -635,6 +664,8 @@ document.addEventListener('DOMContentLoaded', function(){
   const txtInput = document.getElementById('pincc-text-input');
   const fontSel = document.getElementById('pincc-font-select');
   const sizeSl = document.getElementById('pincc-text-size');
+  const textFillTypeSel = document.getElementById('pincc-text-fill-type');
+  const textColorLabel = document.getElementById('pincc-text-color-label');
   const colorInp = document.getElementById('pincc-text-color');
   const borderSl = document.getElementById('pincc-border-size-slider');
   const borderColorInp = document.getElementById('pincc-border-color');
@@ -675,6 +706,8 @@ document.addEventListener('DOMContentLoaded', function(){
   const addIconBtn = document.getElementById('pincc-add-icon');
   const iconCtrls = document.getElementById('pincc-icon-controls');
   const iconSelect = document.getElementById('pincc-icon-select');
+  const iconFillTypeSel = document.getElementById('pincc-icon-fill-type');
+  const iconColorLabel = document.getElementById('pincc-icon-color-label');
   const iconColorInp = document.getElementById('pincc-icon-color');
   const iconSizeSl = document.getElementById('pincc-icon-size');
   const iconRotSl = document.getElementById('pincc-icon-rotation');
@@ -708,7 +741,8 @@ document.addEventListener('DOMContentLoaded', function(){
   curveNumber.value = curveSl.value;
   rotationNumber.value = rotSl.value;
   const shapeBgColorInpLayer = document.getElementById('pincc-shape-bg-color');
-  const shapeBgTransparentChk = document.getElementById('pincc-shape-bg-transparent');
+  const shapeFillTypeSel = document.getElementById('pincc-shape-fill-type');
+  const shapeFillColorLabel = document.getElementById('pincc-shape-fill-color-label');
   const shapeBorderColorInpLayer = document.getElementById('pincc-shape-border-color');
   const shapeBorderWidthSlLayer = document.getElementById('pincc-shape-border-width');
 
@@ -749,12 +783,14 @@ document.addEventListener('DOMContentLoaded', function(){
 
   // your base colors
   const metalBase = {
+    'gold':          '#D4AF37',
     'antique-gold':   '#5C472D',
     'bronze':         '#B38C28',
     'antique-bronze': '#806553',
     'copper':         '#DB803A',
     'antique-copper': '#3D2D20',
     'antique-silver': '#8A7F77',
+    'silver':         '#C0C0C0',
     'black-nickel':   '#AE9F87',
     'black-dye':      '#2C2929',
     'white-dye':      '#E8EAEE',
@@ -825,6 +861,27 @@ document.addEventListener('DOMContentLoaded', function(){
     return makeGradient(base);
   }
 
+  function getMetalFillStyle(mode){
+    const base = metalBase[metalSel.value] || '#A9A9A9';
+    const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    if (mode === 'metal-recessed') {
+      const highlight = adjustColor(base, +50);
+      const midtone = adjustColor(base, -10);
+      const shadow = adjustColor(base, -60);
+      grad.addColorStop(0, highlight);
+      grad.addColorStop(0.45, midtone);
+      grad.addColorStop(1, shadow);
+    } else {
+      const shadow = adjustColor(base, -50);
+      const midtone = adjustColor(base, +20);
+      const highlight = adjustColor(base, +60);
+      grad.addColorStop(0, shadow);
+      grad.addColorStop(0.55, midtone);
+      grad.addColorStop(1, highlight);
+    }
+    return grad;
+  }
+
   function drawShapePath(){
     const w=canvas.width, h=canvas.height;
     ctx.beginPath();
@@ -888,7 +945,12 @@ document.addEventListener('DOMContentLoaded', function(){
             ctx.strokeStyle = getMetalStrokeStyle();
             ctx.strokeText(L.icon, 0, 0);
           }
-          ctx.fillStyle = L.color;
+          const iconFillMode = L.fillMode || 'color';
+          if (iconFillMode === 'metal-raised' || iconFillMode === 'metal-recessed') {
+            ctx.fillStyle = getMetalFillStyle(iconFillMode);
+          } else {
+            ctx.fillStyle = L.color;
+          }
           ctx.fillText(L.icon, 0, 0);
           ctx.restore();
         } else if (L.type === 'text') {
@@ -903,7 +965,12 @@ document.addEventListener('DOMContentLoaded', function(){
           ctx.save(); drawShapePath(); ctx.clip();
           const cx = canvas.width/2 + L.x,
                 cy = canvas.height/2 + L.y;
-          ctx.fillStyle = L.color;
+          const textFillMode = L.fillMode || 'color';
+          if (textFillMode === 'metal-raised' || textFillMode === 'metal-recessed') {
+            ctx.fillStyle = getMetalFillStyle(textFillMode);
+          } else {
+            ctx.fillStyle = L.color;
+          }
           ctx.textAlign = L.align;
           ctx.textBaseline = 'middle';
           ctx.font = `${L.italic?'italic ':''}${L.bold?'bold ':''}${L.fontSize}px ${L.font}`;
@@ -974,7 +1041,11 @@ document.addEventListener('DOMContentLoaded', function(){
           const half = L.size / 2;
           if (L.shape === 'circle') ctx.arc(0, 0, half, 0, 2 * Math.PI);
           else ctx.rect(-half, -half, L.size, L.size);
-          if (L.bgColor) {
+          const shapeFillMode = L.fillMode || (L.bgColor ? 'color' : 'none');
+          if (shapeFillMode === 'metal-raised' || shapeFillMode === 'metal-recessed') {
+            ctx.fillStyle = getMetalFillStyle(shapeFillMode);
+            ctx.fill();
+          } else if (shapeFillMode === 'color' && L.bgColor) {
             ctx.fillStyle = L.bgColor;
             ctx.fill();
           }
@@ -1077,6 +1148,10 @@ document.addEventListener('DOMContentLoaded', function(){
       iconColorInp.value   = L.color;
       iconSizeSl.value     = L.size;
       iconRotSl.value      = L.rotation;
+      const fillMode = L.fillMode || 'color';
+      iconFillTypeSel.value = fillMode;
+      iconColorLabel.style.display = fillMode === 'color' ? 'flex' : 'none';
+      iconColorInp.disabled = fillMode !== 'color';
     } else {
       iconCtrls.style.display = 'none';
     }
@@ -1086,6 +1161,10 @@ document.addEventListener('DOMContentLoaded', function(){
       txtInput.value             = L.text;
       fontSel.value              = L.font;
       sizeSl.value               = L.fontSize;
+      const fillMode             = L.fillMode || 'color';
+      textFillTypeSel.value      = fillMode;
+      textColorLabel.style.display = fillMode === 'color' ? 'flex' : 'none';
+      colorInp.disabled          = fillMode !== 'color';
       colorInp.value             = L.color;
       borderSl.value             = L.borderSize;
       borderColorInp.value       = L.borderColor;
@@ -1113,8 +1192,12 @@ document.addEventListener('DOMContentLoaded', function(){
       shapeCtrls.style.display = 'flex';
       shapeTypeSelLayer.value = L.shape;
       shapeSizeSlLayer.value = L.size;
+      shapeSizeNumber.value = L.size;
+      const fillMode = L.fillMode || (L.bgColor ? 'color' : 'none');
+      shapeFillTypeSel.value = fillMode;
+      shapeFillColorLabel.style.display = fillMode === 'color' ? 'flex' : 'none';
+      shapeBgColorInpLayer.disabled = fillMode !== 'color';
       shapeBgColorInpLayer.value = L.bgColor || '#ffffff';
-      shapeBgTransparentChk.checked = !L.bgColor;
       shapeBorderColorInpLayer.value = L.borderColor;
       shapeBorderWidthSlLayer.value = L.borderWidth;
     } else {
@@ -1150,6 +1233,7 @@ document.addEventListener('DOMContentLoaded', function(){
       fontSize:   24,
       font:       'Arial',
       color:      '#FF8361',
+      fillMode:   'color',
       borderSize: 0,
       borderColor:'#000000',
       curve:      0,
@@ -1171,6 +1255,7 @@ document.addEventListener('DOMContentLoaded', function(){
       x:        0,
       y:        0,
       color:    iconColorInp.value,
+      fillMode: 'color',
       size:     +iconSizeSl.value,
       rotation: +iconRotSl.value
     });
@@ -1184,6 +1269,7 @@ document.addEventListener('DOMContentLoaded', function(){
       shape: 'circle', x:0, y:0,
       size: 100,
       bgColor: '#FF8361',
+      fillMode: 'color',
       borderColor: '#000000',
       borderWidth: 1
     });
@@ -1199,6 +1285,12 @@ document.addEventListener('DOMContentLoaded', function(){
   iconColorInp.addEventListener('input', () => {
     if (selIndex<0 || layers[selIndex].type!=='icon') return;
     layers[selIndex].color = iconColorInp.value; draw();
+  });
+  iconFillTypeSel.addEventListener('change', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'icon') return;
+    layers[selIndex].fillMode = iconFillTypeSel.value;
+    updateControls();
+    draw();
   });
   // Icon controls: slider <-> number sync
   iconSizeSl.addEventListener('input', () => {
@@ -1606,6 +1698,12 @@ document.addEventListener('DOMContentLoaded', function(){
     layers[selIndex].fontSize=+sizeSl.value; draw();
     textSizeNumber.value = sizeSl.value;
   });
+  textFillTypeSel.addEventListener('change', () => {
+    if (selIndex < 0 || layers[selIndex].type !== 'text') return;
+    layers[selIndex].fillMode = textFillTypeSel.value;
+    updateControls();
+    draw();
+  });
   textSizeNumber.addEventListener('input', () => {
     if (selIndex < 0 || layers[selIndex].type !== 'text') return;
     sizeSl.value = textSizeNumber.value;
@@ -1788,12 +1886,22 @@ document.addEventListener('DOMContentLoaded', function(){
   });
   shapeBgColorInpLayer.addEventListener('input', () => {
     if (selIndex < 0 || layers[selIndex].type !== 'shape') return;
-    if (!shapeBgTransparentChk.checked) layers[selIndex].bgColor = shapeBgColorInpLayer.value;
-    draw();
+    const layer = layers[selIndex];
+    const mode = layer.fillMode || (layer.bgColor ? 'color' : 'none');
+    if (mode === 'color') {
+      layer.bgColor = shapeBgColorInpLayer.value;
+      draw();
+    }
   });
-  shapeBgTransparentChk.addEventListener('change', () => {
+  shapeFillTypeSel.addEventListener('change', () => {
     if (selIndex < 0 || layers[selIndex].type !== 'shape') return;
-    layers[selIndex].bgColor = shapeBgTransparentChk.checked ? null : shapeBgColorInpLayer.value;
+    const layer = layers[selIndex];
+    const mode = shapeFillTypeSel.value;
+    layer.fillMode = mode;
+    if (mode === 'color') {
+      layer.bgColor = layer.bgColor || shapeBgColorInpLayer.value || '#ffffff';
+    }
+    updateControls();
     draw();
   });
   shapeBorderColorInpLayer.addEventListener('input', () => {
